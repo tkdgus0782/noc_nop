@@ -11,6 +11,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.RectF;
 import android.util.AttributeSet;
 import android.view.View;
@@ -44,7 +45,16 @@ public class ResultView extends View {//결과 출력 관련
     protected void onDraw(Canvas canvas) {//그리기
         super.onDraw(canvas);
 
+        float cw = canvas.getWidth();
+        float ch = canvas.getHeight();
+
+        mPaintRectangle.setStrokeWidth(8);//아마 선 굵기?
+        mPaintRectangle.setColor(Color.BLUE);
+        mPaintRectangle.setStyle(Paint.Style.STROKE);
+        canvas.drawRect(new RectF(cw/3,ch/3,2*cw/3,2*ch/3), mPaintRectangle);
+
         if (mResults == null) return;
+
         for (Result result : mResults) {
             mPaintRectangle.setStrokeWidth(5);//아마 선 굵기?
             mPaintRectangle.setStyle(Paint.Style.STROKE);

@@ -83,6 +83,62 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
     }
 
+    protected void detectInBox(float rX, float rY,
+                               ArrayList<Result> results,
+                               int[] classes, float threshold){
+
+        Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
+        float tX1 = rX/3;   float tY1 = rY/3;
+        float tX2 = rX*2/3; float tY2 = rY*2/3;
+
+        for(int i=0;i<results.size();i++){
+            Result tmp = results.get(i);
+            int idx = tmp.classIndex;
+            Rect box = tmp.rect;
+            Log.i("object:", PrePostProcessor.mClasses[idx]);
+            vibrator.vibrate(VibrationEffect.createOneShot(1000,100));
+            boolean isDanger = false;
+            int l = 0;
+            if(classes != null)
+                l = classes.length;
+            for(int j=0;j<l;j++){
+                if(classes[j] == idx){
+                    isDanger = true;
+                    break;
+                }
+            }
+
+            if(!isDanger){
+                Log.i("isDanger:", "no\n");
+            }
+            else{
+                Log.i("isDanger:", "yes\n");
+            }
+
+            if(tX1 >= box.right || box.left >= tX2 ||
+                    tY1 >= box.bottom || box.top >= tY2 ) {
+            }
+            else{
+                float x1 = tX1 >= box.left ? tX1 : box.left;
+                float x2 = tX2 <= box.right ? tX2 : box.right;
+                float y1 = tY1 >= box.top ? tY1 : box.top;
+                float y2 = tY2 <= box.bottom ? tY2 : box.bottom;
+
+                float target1 = (tX2-tX1)*(tY2-tY1);
+                float target2 = (box.right-box.left)*(box.bottom - box.top);
+                float overlap = (x2-x1)*(y2-y1);
+                float ratio = (overlap)/(target1+target2-overlap);
+
+                if(ratio >= threshold){
+                    Log.i("threshold:","yes\n");
+                }
+                else{
+                    Log.i("threshold:", "no\n");
+                }
+            }
+        }
+    }
+
     @Override
     @WorkerThread
     @Nullable
@@ -115,26 +171,9 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
         final ArrayList<Result> results = PrePostProcessor.outputsToNMSPredictions(outputs, imgScaleX, imgScaleY, ivScaleX, ivScaleY, 0, 0);
 
-        float targetX1 = imgScaleX/3;
-        float targetY1 = imgScaleY/3;
-        float targetX2 = imgScaleX*2/3;
-        float targetY2 = imgScaleY*2/3;
-
-        for(int i=0;i<results.size();i++){
-            Result tmp = results.get(i);
-            Rect box = tmp.rect;
-
-            Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-            vibrator.vibrate(VibrationEffect.createOneShot(1000,100));
-
-            if(targetX1 >= box.right || box.left >= targetX2 ||
-                targetY1 >= box.bottom || box.top >= targetY2) {
-                continue;
-            }
-            else {
-                float overlap = 0;
-            }
-        }
+        detectInBox((float)mResultView.getWidth(),(float)mResultView.getHeight(),
+                results,
+                null, 0);
 
         return new AnalysisResult(results);
     }

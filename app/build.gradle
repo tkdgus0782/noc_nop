@@ -3,7 +3,6 @@ apply plugin: 'org.jetbrains.kotlin.android'
 
 android {
     compileSdkVersion 31
-    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "org.pytorch.demo.objectdetection"
@@ -30,6 +29,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    namespace 'org.pytorch.demo.objectdetection'
 }
 
 dependencies {

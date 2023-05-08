@@ -30,13 +30,17 @@ public class PrePostProcessor {//이미지 조정 및 클래스들 조정: 매�
     static float[] NO_MEAN_RGB = new float[] {0.0f, 0.0f, 0.0f};
     static float[] NO_STD_RGB = new float[] {1.0f, 1.0f, 1.0f};
 
+
+    static int nClass = 80;//우리가 수집할 클래시의 갯수!!!!!!!!!!!!!!!!!!!!!!!!!!!! 기본 yolo는 80개
+
+
     // model input image size, 여기서 바꾸면 메인에서 비율 조정하는거 바꿔줘야함
     static int mInputWidth = 640;
     static int mInputHeight = 640;
 
     // model output is of size 25200*(num_of_class+5)
     private static int mOutputRow = 25200; // as decided by the YOLOv5 model for input image of size 640*640 : 이미지 비율 바꾸면 바꿔줘야함
-    private static int mOutputColumn = (1 + 5); // 우리가 클래스 학습시킨거 수 + 5 로 바꿔줘야 함/ 매우 중요
+    private static int mOutputColumn = (nClass + 5); // 우리가 클래스 학습시킨거 수 + 5 로 바꿔줘야 함/ 매우 중요
     private static float mThreshold = 0.30f; // 이 점수를 넘어야 학습된 클래스에 부합한다고 간주
     private static int mNmsLimit = 100;//최대 박스 그리는 개수 인듯
 

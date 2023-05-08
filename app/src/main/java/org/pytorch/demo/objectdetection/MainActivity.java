@@ -24,6 +24,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -46,6 +47,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements Runnable {//c언어 main이라 생각하면 됩니다ㅏ
+    private String modelName = "yolov5s.torchscript";
+    private String metaName = "classes.txt";
+
     private int mImageIndex = 0;
     private String[] mTestImages = {"test1.png", "test2.jpg", "test3.png"};//테스트 이미지 셋. 나중에는 live빼고는 다 없애지 않을까 싶음
 
@@ -187,8 +191,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {//c언�
         });
 
         try {
-            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), "best.torchscript"));//
-            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open("kickboard.txt")));
+            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), modelName));//
+            BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open(metaName)));
             //에셋 파일에 추가한 모델 + 모델에 학습된 클래스명들을 순서대로 \n으로 구분해서 같이 투입. 내부적으론 숫자로 관리하니까 무조건 txt도 넣어줘야함
             String line;
             List<String> classes = new ArrayList<>();

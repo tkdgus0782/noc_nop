@@ -30,6 +30,7 @@ import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
 public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetectionActivity.AnalysisResult> {
+    private String modelName = "yolov5s.torchscript";
     private Module mModule = null;
     private ResultView mResultView;
 
@@ -91,12 +92,13 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         float tX1 = rX/3;   float tY1 = rY/3;
         float tX2 = rX*2/3; float tY2 = rY*2/3;
 
+
         for(int i=0;i<results.size();i++){
             Result tmp = results.get(i);
             int idx = tmp.classIndex;
             Rect box = tmp.rect;
             Log.i("object:", PrePostProcessor.mClasses[idx]);
-            vibrator.vibrate(VibrationEffect.createOneShot(1000,100));
+
             boolean isDanger = false;
             int l = 0;
             if(classes != null)
@@ -131,6 +133,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
                 if(ratio >= threshold){
                     Log.i("threshold:","yes\n");
+                    vibrator.vibrate(VibrationEffect.createOneShot(1000,100));
                 }
                 else{
                     Log.i("threshold:", "no\n");
@@ -146,7 +149,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         try {
             if (mModule == null) {
                 mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(),
-                        "best.torchscript"));//모델 불러오기
+                        modelName));//모델 불러오기
             }
         } catch (IOException e) {
             Log.e("Object Detection", "Error reading assets", e);

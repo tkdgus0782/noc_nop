@@ -7,23 +7,30 @@
 package org.pytorch.demo.objectdetection;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.util.Size;
+import android.view.SurfaceView;
 import android.view.TextureView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.UiThread;
 import androidx.annotation.WorkerThread;
+
 import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageAnalysis;
-import androidx.camera.core.ImageAnalysisConfig;
 import androidx.camera.core.ImageProxy;
 import androidx.camera.core.Preview;
-import androidx.camera.core.PreviewConfig;
 import androidx.core.app.ActivityCompat;
+
+//import java.util.concurrent.Executor;
+//import androidx.camera.core.CameraSelector;
+//import androidx.core.content.ContextCompat;
+import androidx.camera.core.PreviewConfig;
+import androidx.camera.core.ImageAnalysisConfig;
 
 public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//라이브러리 조작에 뼈대가 되는 activity (사용 라이브러리 하나당 베이스모듈 1개)
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 200;
@@ -55,13 +62,14 @@ public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//�
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_CODE_CAMERA_PERMISSION) {
             if (grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 Toast.makeText(
-                    this,
-                    "You can't use object detection example without granting CAMERA permission",
-                    Toast.LENGTH_LONG)
-                    .show();
+                                this,
+                                "You can't use object detection example without granting CAMERA permission",
+                                Toast.LENGTH_LONG)
+                        .show();
                 finish();//이 액티비티를 종료함 (권한 허용 안했으니까 프로그램을 아예 종료)
             } else {
                 setupCameraX();//카메라 객체 생성함
@@ -71,6 +79,7 @@ public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//�
 
     private void setupCameraX() {
         final TextureView textureView = getCameraPreviewTextureView();//카메라에 찍힌 거를 화면에 보여줌
+
         final PreviewConfig previewConfig = new PreviewConfig.Builder().build();
         final Preview preview = new Preview(previewConfig);
         preview.setOnPreviewOutputUpdateListener(output -> textureView.setSurfaceTexture(output.getSurfaceTexture()));
@@ -97,6 +106,9 @@ public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//�
 
         CameraX.bindToLifecycle(this, preview, imageAnalysis);//유저가 카메라에 켜고 끔에따라 객체가 생성/소멸되도록 함.
     }
+
+
+
 
     @WorkerThread
     @Nullable

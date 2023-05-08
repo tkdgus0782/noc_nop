@@ -7,6 +7,7 @@ import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.media.Image;
+import android.os.Build;
 import android.os.VibrationEffect;
 import android.util.Log;
 import android.view.TextureView;
@@ -133,7 +134,9 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
                 if(ratio >= threshold){
                     Log.i("threshold:","yes\n");
-                    vibrator.vibrate(VibrationEffect.createOneShot(1000,100));
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                        vibrator.vibrate(VibrationEffect.createOneShot(1000,100));
+                    }
                 }
                 else{
                     Log.i("threshold:", "no\n");

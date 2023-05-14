@@ -92,7 +92,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         float tX1 = rX/3;   float tY1 = rY/3;
         float tX2 = rX*2/3; float tY2 = rY*2/3;
-
+        int count = 0;
         int detected[] = new int[PrePostProcessor.nClass];
 
         for(int i=0;i<results.size();i++){
@@ -102,6 +102,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
             //Log.i("object:", PrePostProcessor.mClasses[idx]);
             //Log.i("threshold:",box.left + " " + box.right+ " " + box.top + " " + box.bottom);
             detected[idx]++;
+            count++;
 
             boolean isDanger = false;
             int l = 0;
@@ -134,12 +135,12 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                 float target2 = (box.right-box.left)*(box.bottom - box.top);
                 float overlap = (x2-x1)*(y2-y1);
                 float ratio = (overlap)/(target2) > (overlap)/(target1) ? (overlap)/(target2) : (overlap)/(target1);
-                Log.i("threshold:",overlap + " " + target1 + " " + target2 + " " +  ratio);
+                //Log.i("threshold:",overlap + " " + target1 + " " + target2 + " " +  ratio);
                 //Log.i("threshold:",rX + " " + rY + " " + box.right + " " +  box.left + " " + box.top + " " + box.bottom + " " + overlap);
                 if(ratio >= threshold){
                     //Log.i("threshold:","yes\n");
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(1000,100));
+                        vibrator.vibrate(VibrationEffect.createOneShot(10,100));
                     }
                 }
                 else{
@@ -152,14 +153,18 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         if(!this.TTS){//아직 tts로 알려준지 얼마 안됐음.
             return;
         }
-        int count = 0;
-
 
         if(count == 0){
             //Log.i("tts:","no target objects to tts");
         }
         else{
             this.mLastAlertTime = this.mLastAnalysisResultTime;
+            Log.i("detected for TTS: ","in time" + this.mLastAlertTime);
+            for(int i=0;i<PrePostProcessor.nClass;i++){
+                if(detected[i] > 0){
+                    Log.i("", PrePostProcessor.mClasses[i] + " appears in box " + detected[i] + " times");
+                }
+            }
         }
 
     }

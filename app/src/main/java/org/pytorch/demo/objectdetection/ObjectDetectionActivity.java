@@ -93,12 +93,14 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         float tX1 = rX/3;   float tY1 = rY/3;
         float tX2 = rX*2/3; float tY2 = rY*2/3;
 
+        int detected[] = new int[PrePostProcessor.nClass];
 
         for(int i=0;i<results.size();i++){
             Result tmp = results.get(i);
             int idx = tmp.classIndex;
             Rect box = tmp.rect;
             Log.i("object:", PrePostProcessor.mClasses[idx]);
+            detected[idx]++;
 
             boolean isDanger = false;
             int l = 0;
@@ -143,6 +145,21 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                 }
             }
         }
+
+        //tts
+        if(!this.TTS){//아직 tts로 알려준지 얼마 안됐음.
+            return;
+        }
+        int count = 0;
+
+
+        if(count == 0){
+            Log.i("tts:","no target objects to tts");
+        }
+        else{
+            this.mLastAlertTime = this.mLastAnalysisResultTime;
+        }
+
     }
 
     @Override

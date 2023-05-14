@@ -36,8 +36,9 @@ public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//�
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 200;
     private static final String[] PERMISSIONS = {Manifest.permission.CAMERA};//카메라 권한 관련
 
-    private long mLastAnalysisResultTime;//마지막으로 이미지 처리한 시점부터 지난 시간 == interval
-
+    protected long mLastAnalysisResultTime;//마지막으로 이미지 처리한 시점부터 지난 시간 == interval
+    protected long mLastAlertTime;
+    protected boolean TTS = true;
     protected abstract int getContentViewLayoutId();
 
     protected abstract TextureView getCameraPreviewTextureView();
@@ -95,6 +96,12 @@ public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//�
         imageAnalysis.setAnalyzer((image, rotationDegrees) -> {//이건 가로, 세로인지 방향 조정 가능
             if (SystemClock.elapsedRealtime() - mLastAnalysisResultTime < 10) {/////이거 조정하면 될듯. 적는 숫자가 제한 프레임. 없애면 프레임 계속 들쭉날쭉
                 return;
+            }
+            if (SystemClock.elapsedRealtime() - mLastAlertTime < 3000) {/////이거 조정하면 될듯. 적는 숫자가 제한 프레임. 없애면 프레임 계속 들쭉날쭉
+                TTS = false;
+            }
+            else{
+                TTS = true;
             }
 
             final R result = analyzeImage(image, rotationDegrees);

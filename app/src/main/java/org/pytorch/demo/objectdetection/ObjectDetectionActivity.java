@@ -23,6 +23,7 @@ import org.pytorch.IValue;
 import org.pytorch.LiteModuleLoader;
 import org.pytorch.Module;
 import org.pytorch.Tensor;
+import org.pytorch.demo.depthestimation.MiDASModel;
 import org.pytorch.torchvision.TensorImageUtils;
 
 import java.io.ByteArrayOutputStream;
@@ -145,6 +146,13 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         }
     }
 
+
+    protected Bitmap getDepthImage(Bitmap bitmap) {
+        MiDASModel myMidas = new MiDASModel(this);
+        Bitmap result = myMidas.getDepthMap(bitmap);
+        return result;
+    }
+
     @Override
     @WorkerThread
     @Nullable
@@ -159,6 +167,9 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
             return null;
         }
         Bitmap bitmap = imgToBitmap(image.getImage());
+
+        //Bitmap depthBitmap = getDepthImage(bitmap);
+
         Matrix matrix = new Matrix();
         matrix.postRotate(90.0f);
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);

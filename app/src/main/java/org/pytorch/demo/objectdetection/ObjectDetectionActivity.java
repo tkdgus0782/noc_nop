@@ -99,7 +99,8 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
             Result tmp = results.get(i);
             int idx = tmp.classIndex;
             Rect box = tmp.rect;
-            Log.i("object:", PrePostProcessor.mClasses[idx]);
+            //Log.i("object:", PrePostProcessor.mClasses[idx]);
+            //Log.i("threshold:",box.left + " " + box.right+ " " + box.top + " " + box.bottom);
             detected[idx]++;
 
             boolean isDanger = false;
@@ -114,10 +115,10 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
             }
 
             if(!isDanger){
-                Log.i("isDanger:", "no\n");
+                //Log.i("isDanger:", "no\n");
             }
             else{
-                Log.i("isDanger:", "yes\n");
+                //Log.i("isDanger:", "yes\n");
             }
 
             if(tX1 >= box.right || box.left >= tX2 ||
@@ -132,16 +133,17 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                 float target1 = (tX2-tX1)*(tY2-tY1);
                 float target2 = (box.right-box.left)*(box.bottom - box.top);
                 float overlap = (x2-x1)*(y2-y1);
-                float ratio = (overlap)/(target1+target2-overlap);
-
+                float ratio = (overlap)/(target2) > (overlap)/(target1) ? (overlap)/(target2) : (overlap)/(target1);
+                Log.i("threshold:",overlap + " " + target1 + " " + target2 + " " +  ratio);
+                //Log.i("threshold:",rX + " " + rY + " " + box.right + " " +  box.left + " " + box.top + " " + box.bottom + " " + overlap);
                 if(ratio >= threshold){
-                    Log.i("threshold:","yes\n");
+                    //Log.i("threshold:","yes\n");
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         vibrator.vibrate(VibrationEffect.createOneShot(1000,100));
                     }
                 }
                 else{
-                    Log.i("threshold:", "no\n");
+                    //Log.i("threshold:", "no\n");
                 }
             }
         }
@@ -154,7 +156,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
 
         if(count == 0){
-            Log.i("tts:","no target objects to tts");
+            //Log.i("tts:","no target objects to tts");
         }
         else{
             this.mLastAlertTime = this.mLastAnalysisResultTime;
@@ -196,7 +198,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
         detectInBox((float)mResultView.getWidth(),(float)mResultView.getHeight(),
                 results,
-                null, 0);
+                null, 0.5f);
 
         return new AnalysisResult(results);
     }

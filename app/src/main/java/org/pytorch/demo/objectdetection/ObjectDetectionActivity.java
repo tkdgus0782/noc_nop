@@ -9,6 +9,7 @@ import android.graphics.YuvImage;
 import android.media.Image;
 import android.os.Build;
 import android.os.VibrationEffect;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.ViewStub;
@@ -34,7 +35,6 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
     private String modelName = "yolov5s.torchscript";
     private Module mModule = null;
     private ResultView mResultView;
-
     static class AnalysisResult {
         private final ArrayList<Result> mResults;
 
@@ -101,8 +101,6 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
             Rect box = tmp.rect;
             //Log.i("object:", PrePostProcessor.mClasses[idx]);
             //Log.i("threshold:",box.left + " " + box.right+ " " + box.top + " " + box.bottom);
-            detected[idx]++;
-            count++;
 
             boolean isDanger = false;
             int l = 0;
@@ -142,6 +140,8 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         vibrator.vibrate(VibrationEffect.createOneShot(10,100));
                     }
+                    detected[idx]++;
+                    count++;
                 }
                 else{
                     //Log.i("threshold:", "no\n");
@@ -158,13 +158,23 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
             //Log.i("tts:","no target objects to tts");
         }
         else{
+            CharSequence text;
+            String temp = "";
+            voice.setPitch((float)0.6); // 음성 톤 높이 지정
+            voice.setSpeechRate((float)1.5); // 음성 속도 지정
+
             this.mLastAlertTime = this.mLastAnalysisResultTime;
             Log.i("detected for TTS: ","in time" + this.mLastAlertTime);
             for(int i=0;i<PrePostProcessor.nClass;i++){
                 if(detected[i] > 0){
-                    Log.i("", PrePostProcessor.mClasses[i] + " appears in box " + detected[i] + " times");
+                    temp += detected[i] +PrePostProcessor.mClasses[i] +",";
                 }
             }
+            voice.setSpeechRate((float)6); // 음성 속도 지정
+            temp += "가 영역내에서 감지되었습니다.";
+            Log.i("",temp);
+            text = temp;
+            voice.speak(text, TextToSpeech.QUEUE_ADD, null, "id1");
         }
 
     }

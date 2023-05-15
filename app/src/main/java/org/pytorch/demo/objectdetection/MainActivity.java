@@ -61,6 +61,10 @@ public class MainActivity extends AppCompatActivity implements Runnable {//c언�
     private Module mModule = null;//이미지 모델 로드
     private float mImgScaleX, mImgScaleY, mIvScaleX, mIvScaleY, mStartX, mStartY;//이미지 프로세싱
 
+    protected class backgroundThread extends Thread{
+        protected boolean isRun = true;
+    }
+
     public static String assetFilePath(Context context, String assetName) throws IOException {//asset   파일들의 위치 경로를 설정해줌. 건들x
         File file = new File(context.getFilesDir(), assetName);
         if (file.exists() && file.length() > 0) {
@@ -159,8 +163,14 @@ public class MainActivity extends AppCompatActivity implements Runnable {//c언�
         final Button buttonLive = findViewById(R.id.liveButton);//라이브 버튼. 아마 이것도 없애지 않을까. 그냥 없애고 기본으로 이모드가 설정되게 하려나
         buttonLive.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
+
               final Intent intent = new Intent(MainActivity.this, ObjectDetectionActivity.class);
               startActivity(intent);
+              /*
+              final Intent intent = new Intent(MainActivity.this, ObjectDetectionActivity.class);
+              startActivity(intent);
+               */
+
             }
         });
 

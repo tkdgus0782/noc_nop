@@ -1,5 +1,7 @@
 package org.pytorch.demo.objectdetection;
 
+import android.app.Service;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -8,6 +10,9 @@ import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.media.Image;
 import android.os.Build;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.os.VibrationEffect;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -16,6 +21,7 @@ import android.view.ViewStub;
 
 import android.os.Vibrator;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 import androidx.camera.core.ImageProxy;
@@ -31,7 +37,7 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetectionActivity.AnalysisResult> {
+public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetectionActivity.AnalysisResult>{
     private String modelName = "yolov5s.torchscript";
     private Module mModule = null;
     private ResultView mResultView;

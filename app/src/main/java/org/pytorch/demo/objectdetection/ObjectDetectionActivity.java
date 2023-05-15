@@ -168,7 +168,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         }
         Bitmap bitmap = imgToBitmap(image.getImage());
 
-        //Bitmap depthBitmap = getDepthImage(bitmap);
+        Bitmap depthBitmap = getDepthImage(bitmap);
 
         Matrix matrix = new Matrix();
         matrix.postRotate(90.0f);

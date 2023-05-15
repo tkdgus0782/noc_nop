@@ -1,13 +1,18 @@
 package org.pytorch.demo.objectdetection;
 
+import android.annotation.SuppressLint;
 import android.app.Service;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Camera;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
+import android.hardware.camera2.CameraAccessException;
+import android.hardware.camera2.CameraCharacteristics;
+import android.hardware.camera2.CameraManager;
 import android.media.Image;
 import android.os.Build;
 import android.os.Handler;
@@ -24,7 +29,10 @@ import android.os.Vibrator;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
+import androidx.camera.core.CameraInfo;
+import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageProxy;
+import androidx.lifecycle.LiveData;
 
 import org.pytorch.IValue;
 import org.pytorch.LiteModuleLoader;
@@ -97,7 +105,6 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
     protected void detectInBox(float rX, float rY,
                                ArrayList<Result> results,
                                int[] classes, float threshold){
-
         Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         float tX1 = rX/3;   float tY1 = rY/3;
         float tX2 = rX*2/3; float tY2 = rY*2/3;
@@ -229,6 +236,8 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
 
         final ArrayList<Result> results = PrePostProcessor.outputsToNMSPredictions(outputs, imgScaleX, imgScaleY, ivScaleX, ivScaleY, 0, 0);
+
+
 
         detectInBox((float)mResultView.getWidth(),(float)mResultView.getHeight(),
                 results,

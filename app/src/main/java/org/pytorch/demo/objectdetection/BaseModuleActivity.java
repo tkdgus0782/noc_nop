@@ -14,7 +14,7 @@ import android.util.Log;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-public class BaseModuleActivity extends AppCompatActivity implements Runnable{//헤더파일 느낌으로 뼈대만 생성하는 코드
+public class BaseModuleActivity extends AppCompatActivity{//헤더파일 느낌으로 뼈대만 생성하는 코드
     protected HandlerThread mBackgroundThread;
     protected Handler mBackgroundHandler;
     protected Handler mUIHandler;
@@ -56,8 +56,4 @@ public class BaseModuleActivity extends AppCompatActivity implements Runnable{//
       }
     }
 
-    @Override
-    public void run() {
-        Log.i("Runnable Thread:", "working");
-    }
 }

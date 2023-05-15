@@ -8,9 +8,12 @@ package org.pytorch.demo.objectdetection;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.speech.tts.TextToSpeech;
+import android.util.Log;
 import android.util.Size;
 import android.view.SurfaceView;
 import android.view.TextureView;
@@ -32,12 +35,16 @@ import androidx.core.app.ActivityCompat;
 import androidx.camera.core.PreviewConfig;
 import androidx.camera.core.ImageAnalysisConfig;
 
-public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//라이브러리 조작에 뼈대가 되는 activity (사용 라이브러리 하나당 베이스모듈 1개)
+import java.util.Locale;
+
+public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity implements TextToSpeech.OnInitListener{//라이브러리 조작에 뼈대가 되는 activity (사용 라이브러리 하나당 베이스모듈 1개)
     private static final int REQUEST_CODE_CAMERA_PERMISSION = 200;
     private static final String[] PERMISSIONS = {Manifest.permission.CAMERA};//카메라 권한 관련
 
-    private long mLastAnalysisResultTime;//마지막으로 이미지 처리한 시점부터 지난 시간 == interval
-
+    protected long mLastAnalysisResultTime;//마지막으로 이미지 처리한 시점부터 지난 시간 == interval
+    protected long mLastAlertTime;
+    protected boolean TTS = true;
+    protected TextToSpeech voice;
     protected abstract int getContentViewLayoutId();
 
     protected abstract TextureView getCameraPreviewTextureView();
@@ -56,6 +63,7 @@ public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//�
                 PERMISSIONS,
                 REQUEST_CODE_CAMERA_PERMISSION);//권한 설정 요청
         } else {
+            voice = new TextToSpeech(this, (TextToSpeech.OnInitListener) this);
             setupCameraX();//카메라 권한 설정에 성공시 카메라 객체 생성
         }
     }
@@ -96,6 +104,12 @@ public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//�
             if (SystemClock.elapsedRealtime() - mLastAnalysisResultTime < 10) {/////이거 조정하면 될듯. 적는 숫자가 제한 프레임. 없애면 프레임 계속 들쭉날쭉
                 return;
             }
+            if (SystemClock.elapsedRealtime() - mLastAlertTime < 3000) {/////이거 조정하면 될듯. 적는 숫자가 제한 프레임. 없애면 프레임 계속 들쭉날쭉
+                TTS = false;
+            }
+            else{
+                TTS = true;
+            }
 
             final R result = analyzeImage(image, rotationDegrees);
             if (result != null) {
@@ -108,7 +122,27 @@ public abstract class AbstractCameraXActivity<R> extends BaseModuleActivity {//�
     }
 
 
+    @Override
+    public void onDestroy() {
+        if(voice!=null){ // 사용한 TTS객체 제거
+            voice.stop();
+            voice.shutdown();
+        }
+        super.onDestroy();
+    }
 
+    @Override
+    public void onInit(int status) { // OnInitListener를 통해서 TTS 초기화
+        if(status == TextToSpeech.SUCCESS){
+            int result = voice.setLanguage(Locale.KOREA); // TTS언어 한국어로 설정
+
+            if(result == TextToSpeech.LANG_NOT_SUPPORTED || result == TextToSpeech.LANG_MISSING_DATA){
+                Log.e("TTS", "This Language is not supported");
+            }
+        }else{
+            Log.e("TTS", "Initialization Failed!");
+        }
+    }
 
     @WorkerThread
     @Nullable

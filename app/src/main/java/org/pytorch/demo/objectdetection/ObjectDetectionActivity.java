@@ -1,5 +1,7 @@
 package org.pytorch.demo.objectdetection;
 
+import android.app.Service;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.ImageFormat;
@@ -8,13 +10,18 @@ import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.media.Image;
 import android.os.Build;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
 import android.os.VibrationEffect;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.TextureView;
 import android.view.ViewStub;
 
 import android.os.Vibrator;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
 import androidx.camera.core.ImageProxy;
@@ -35,6 +42,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
     private String modelName = "yolov5s.torchscript";
     private Module mModule = null;
     private ResultView mResultView;
+
 
     static class AnalysisResult {
         private final ArrayList<Result> mResults;
@@ -93,13 +101,15 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
         float tX1 = rX/3;   float tY1 = rY/3;
         float tX2 = rX*2/3; float tY2 = rY*2/3;
-
+        int count = 0;
+        int detected[] = new int[PrePostProcessor.nClass];
 
         for(int i=0;i<results.size();i++){
             Result tmp = results.get(i);
             int idx = tmp.classIndex;
             Rect box = tmp.rect;
-            Log.i("object:", PrePostProcessor.mClasses[idx]);
+            //Log.i("object:", PrePostProcessor.mClasses[idx]);
+            //Log.i("threshold:",box.left + " " + box.right+ " " + box.top + " " + box.bottom);
 
             boolean isDanger = false;
             int l = 0;
@@ -113,10 +123,10 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
             }
 
             if(!isDanger){
-                Log.i("isDanger:", "no\n");
+                //Log.i("isDanger:", "no\n");
             }
             else{
-                Log.i("isDanger:", "yes\n");
+                //Log.i("isDanger:", "yes\n");
             }
 
             if(tX1 >= box.right || box.left >= tX2 ||
@@ -131,19 +141,51 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                 float target1 = (tX2-tX1)*(tY2-tY1);
                 float target2 = (box.right-box.left)*(box.bottom - box.top);
                 float overlap = (x2-x1)*(y2-y1);
-                float ratio = (overlap)/(target1+target2-overlap);
-
+                float ratio = (overlap)/(target2) > (overlap)/(target1) ? (overlap)/(target2) : (overlap)/(target1);
+                //Log.i("threshold:",overlap + " " + target1 + " " + target2 + " " +  ratio);
+                //Log.i("threshold:",rX + " " + rY + " " + box.right + " " +  box.left + " " + box.top + " " + box.bottom + " " + overlap);
                 if(ratio >= threshold){
-                    Log.i("threshold:","yes\n");
+                    //Log.i("threshold:","yes\n");
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                        vibrator.vibrate(VibrationEffect.createOneShot(1000,100));
+                        vibrator.vibrate(VibrationEffect.createOneShot(10,100));
                     }
+                    detected[idx]++;
+                    count++;
                 }
                 else{
                     Log.i("threshold:", "no\n");
                 }
             }
         }
+
+        //tts
+        if(!this.TTS){//아직 tts로 알려준지 얼마 안됐음.
+            return;
+        }
+
+        if(count == 0){
+            //Log.i("tts:","no target objects to tts");
+        }
+        else{
+            CharSequence text;
+            String temp = "";
+            voice.setPitch((float)0.6); // 음성 톤 높이 지정
+            voice.setSpeechRate((float)1.5); // 음성 속도 지정
+
+            this.mLastAlertTime = this.mLastAnalysisResultTime;
+            Log.i("detected for TTS: ","in time" + this.mLastAlertTime);
+            for(int i=0;i<PrePostProcessor.nClass;i++){
+                if(detected[i] > 0){
+                    temp += detected[i] +PrePostProcessor.mClasses[i] +",";
+                }
+            }
+            voice.setSpeechRate((float)6); // 음성 속도 지정
+            temp += "가 영역내에서 감지되었습니다.";
+            Log.i("",temp);
+            text = temp;
+            voice.speak(text, TextToSpeech.QUEUE_ADD, null, "id1");
+        }
+
     }
 
 
@@ -190,7 +232,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
         detectInBox((float)mResultView.getWidth(),(float)mResultView.getHeight(),
                 results,
-                null, 0);
+                null, 0.5f);
 
         return new AnalysisResult(results);
     }

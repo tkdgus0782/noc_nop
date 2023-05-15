@@ -37,7 +37,6 @@ public class ResultView extends View {//결과 출력 관련
     public ResultView(Context context, AttributeSet attrs){
         super(context, attrs);
         mPaintRectangle = new Paint();
-        mPaintRectangle.setColor(Color.YELLOW);//박스 색 조정
         mPaintText = new Paint();
     }
 
@@ -49,13 +48,14 @@ public class ResultView extends View {//결과 출력 관련
         float ch = canvas.getHeight();
 
         mPaintRectangle.setStrokeWidth(8);//아마 선 굵기?
-        mPaintRectangle.setColor(Color.BLUE);
+        mPaintRectangle.setColor(Color.RED);
         mPaintRectangle.setStyle(Paint.Style.STROKE);
         canvas.drawRect(new RectF(cw/3,ch/3,2*cw/3,2*ch/3), mPaintRectangle);
 
         if (mResults == null) return;
 
         for (Result result : mResults) {
+            mPaintRectangle.setColor(Color.YELLOW);//박스 색 조정
             mPaintRectangle.setStrokeWidth(5);//아마 선 굵기?
             mPaintRectangle.setStyle(Paint.Style.STROKE);
             canvas.drawRect(result.rect, mPaintRectangle);

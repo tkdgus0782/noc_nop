@@ -37,10 +37,12 @@ import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 
-public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetectionActivity.AnalysisResult>{
+public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetectionActivity.AnalysisResult> {
     private String modelName = "yolov5s.torchscript";
     private Module mModule = null;
     private ResultView mResultView;
+
+
     static class AnalysisResult {
         private final ArrayList<Result> mResults;
 
@@ -150,7 +152,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                     count++;
                 }
                 else{
-                    //Log.i("threshold:", "no\n");
+                    Log.i("threshold:", "no\n");
                 }
             }
         }

@@ -164,13 +164,11 @@ public class MainActivity extends AppCompatActivity implements Runnable {//cì–¸ì
         buttonLive.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
 
-              final Intent intent = new Intent(MainActivity.this, ObjectDetectionActivity.class);
-              startActivity(intent);
-              /*
-              final Intent intent = new Intent(MainActivity.this, ObjectDetectionActivity.class);
-              startActivity(intent);
-               */
+                final Intent intent = new Intent(MainActivity.this, ObjectDetectionActivity.class);
+                startActivity(intent);
 
+                //Thread thread = new Thread(new ObjectDetectionActivity());
+                //thread.start();
             }
         });
 

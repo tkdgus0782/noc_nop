@@ -6,6 +6,8 @@
 
 package org.pytorch.demo.objectdetection;
 
+import static org.pytorch.demo.objectdetection.ObjectDetectionActivity.temp;
+
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -50,6 +52,11 @@ public class ResultView extends View {//결과 출력 관련
         mPaintRectangle.setStrokeWidth(8);//아마 선 굵기?
         mPaintRectangle.setColor(Color.RED);
         mPaintRectangle.setStyle(Paint.Style.STROKE);
+
+        if(temp != null){
+            canvas.drawBitmap(temp,null,new RectF(0,0,cw,ch),null);
+        }
+
         canvas.drawRect(new RectF(cw/3,ch/3,2*cw/3,2*ch/3), mPaintRectangle);
 
         if (mResults == null) return;
@@ -59,6 +66,7 @@ public class ResultView extends View {//결과 출력 관련
             mPaintRectangle.setStrokeWidth(5);//아마 선 굵기?
             mPaintRectangle.setStyle(Paint.Style.STROKE);
             canvas.drawRect(result.rect, mPaintRectangle);
+
 
             //여기를 조정하면 라벨링이 그려지는 모양을 수정할 수 있습니다.
             Path mPath = new Path();

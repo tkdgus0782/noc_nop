@@ -50,7 +50,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
     private String modelName = "yolov5s.torchscript";
     private Module mModule = null;
     private ResultView mResultView;
-
+    public static Bitmap temp = null;
 
     static class AnalysisResult {
         private final ArrayList<Result> mResults;
@@ -218,10 +218,12 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         Bitmap bitmap = imgToBitmap(image.getImage());
 
         Bitmap depthBitmap = getDepthImage(bitmap);
+        temp = depthBitmap;
 
         Matrix matrix = new Matrix();
         matrix.postRotate(90.0f);
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
+        temp = Bitmap.createBitmap(depthBitmap, 0, 0, depthBitmap.getWidth(), depthBitmap.getHeight(), matrix, true);
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, PrePostProcessor.mInputWidth, PrePostProcessor.mInputHeight, true);
 
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(resizedBitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);

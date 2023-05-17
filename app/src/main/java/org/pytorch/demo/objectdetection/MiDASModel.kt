@@ -84,8 +84,11 @@ class MiDASModel( context: Context ) {
     }
 
 
-    fun getDepthMap( inputImage : Bitmap ) : Bitmap {
-        return run( inputImage )
+    fun getDepthMap( inputImage : Bitmap, t1 : Long ) : Bitmap {
+        Log.i( "in-MiDAS", "MiDaSStart inference speed: ${System.currentTimeMillis() - t1}")
+        var returnBitmap = run( inputImage )
+        Log.i( "in-MiDAS", "MiDaSEnd inference speed: ${System.currentTimeMillis() - t1}")
+        return returnBitmap
     }
 
 
@@ -96,7 +99,7 @@ class MiDASModel( context: Context ) {
         // Then perform operations on the tensor as described by `inputTensorProcessor`.
         var inputTensor = TensorImage.fromBitmap( inputImage )
 
-        val t1 = System.currentTimeMillis()
+        //val t1 = System.currentTimeMillis()
         inputTensor = inputTensorProcessor.process( inputTensor )
 
         // Output tensor of shape ( 256 , 256 , 1 ) and data type float32
@@ -109,7 +112,7 @@ class MiDASModel( context: Context ) {
         // Perform operations on the output tensor as described by `outputTensorProcessor`.
         outputTensor = outputTensorProcessor.process( outputTensor )
 
-        Log.i( "in-MiDAS", "MiDaS inference speed: ${System.currentTimeMillis() - t1}")
+        //Log.i( "in-MiDAS", "MiDaS inference speed: ${System.currentTimeMillis() - t1}")
 
         // Create a Bitmap from the depth map which will be displayed on the screen.
         return BitmapUtils.byteBufferToBitmap( outputTensor.floatArray , inputImageDim )

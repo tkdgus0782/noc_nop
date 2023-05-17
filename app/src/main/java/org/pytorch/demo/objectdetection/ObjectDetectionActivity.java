@@ -1,23 +1,13 @@
 package org.pytorch.demo.objectdetection;
 
-import android.annotation.SuppressLint;
-import android.app.Service;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Camera;
 import android.graphics.ImageFormat;
 import android.graphics.Matrix;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
-import android.hardware.camera2.CameraAccessException;
-import android.hardware.camera2.CameraCharacteristics;
-import android.hardware.camera2.CameraManager;
 import android.media.Image;
 import android.os.Build;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
 import android.os.VibrationEffect;
 import android.speech.tts.TextToSpeech;
 import android.util.Log;
@@ -26,13 +16,9 @@ import android.view.ViewStub;
 
 import android.os.Vibrator;
 
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
-import androidx.camera.core.CameraInfo;
-import androidx.camera.core.CameraX;
 import androidx.camera.core.ImageProxy;
-import androidx.lifecycle.LiveData;
 
 import org.pytorch.IValue;
 import org.pytorch.LiteModuleLoader;
@@ -195,10 +181,12 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
     }
 
+    private MiDASModel myMidas = null;
 
-    protected Bitmap getDepthImage(Bitmap bitmap) {
-        MiDASModel myMidas = new MiDASModel(this);
-        Bitmap result = myMidas.getDepthMap(bitmap);
+    protected Bitmap getDepthImage(Bitmap bitmap, long t1) {
+        Log.i( "in ObjectDetection", "MiDaSStart inference speed: " + (System.currentTimeMillis() - t1));
+        Bitmap result = myMidas.getDepthMap(bitmap, t1);
+        Log.i( "in ObjectDetection", "MiDaSEnd inference speed: " + (System.currentTimeMillis() - t1));
         return result;
     }
 
@@ -206,19 +194,31 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
     @WorkerThread
     @Nullable
     protected AnalysisResult analyzeImage(ImageProxy image, int rotationDegrees) {//모델이 예측 수행
+
+        long t1 = System.currentTimeMillis();
+
         try {
             if (mModule == null) {
                 mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(),
                         modelName));//모델 불러오기
+                myMidas = new MiDASModel(this);
             }
         } catch (IOException e) {
             Log.e("Object Detection", "Error reading assets", e);
             return null;
         }
+
+
+        Log.i( "in ObjectDetection", "setModel inference speed: " + (System.currentTimeMillis() - t1));
+
         Bitmap bitmap = imgToBitmap(image.getImage());
 
-        Bitmap depthBitmap = getDepthImage(bitmap);
+        Log.i( "in ObjectDetection", "getBitmap inference speed: " + (System.currentTimeMillis() - t1));
+
+        Bitmap depthBitmap = getDepthImage(bitmap, t1);
         temp = depthBitmap;
+
+        Log.i( "in ObjectDetection", "getDepth inference speed: " + (System.currentTimeMillis() - t1));
 
         Matrix matrix = new Matrix();
         matrix.postRotate(90.0f);
@@ -239,11 +239,14 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
         final ArrayList<Result> results = PrePostProcessor.outputsToNMSPredictions(outputs, imgScaleX, imgScaleY, ivScaleX, ivScaleY, 0, 0);
 
-
+        Log.i( "in ObjectDetection", "getDetection inference speed: " + (System.currentTimeMillis() - t1));
 
         detectInBox((float)mResultView.getWidth(),(float)mResultView.getHeight(),
                 results,
                 null, 0.5f);
+
+
+        Log.i( "in ObjectDetection", "ObjectDetection inference speed: " + (System.currentTimeMillis() - t1));
 
         return new AnalysisResult(results);
     }

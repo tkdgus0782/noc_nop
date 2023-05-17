@@ -36,7 +36,13 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
     private String modelName = "yolov5s.torchscript";
     private Module mModule = null;
     private ResultView mResultView;
+
     public static Bitmap temp = null;
+    private static boolean isMidas = false;
+
+    public class depthFinding{
+
+    }
 
     static class AnalysisResult {
         private final ArrayList<Result> mResults;
@@ -215,15 +221,30 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
         Log.i( "in ObjectDetection", "getBitmap inference speed: " + (System.currentTimeMillis() - t1));
 
-        Bitmap depthBitmap = getDepthImage(bitmap, t1);
-        temp = depthBitmap;
 
         Log.i( "in ObjectDetection", "getDepth inference speed: " + (System.currentTimeMillis() - t1));
 
         Matrix matrix = new Matrix();
         matrix.postRotate(90.0f);
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-        temp = Bitmap.createBitmap(depthBitmap, 0, 0, depthBitmap.getWidth(), depthBitmap.getHeight(), matrix, true);
+
+        Bitmap finalBitmap = bitmap;
+        Thread thread = new Thread(() -> {
+            isMidas = true;
+            Bitmap depthBitmap = getDepthImage(finalBitmap, t1);
+            temp = depthBitmap;
+            temp = Bitmap.createBitmap(depthBitmap, 0, 0, depthBitmap.getWidth(), depthBitmap.getHeight(), matrix, true);
+            isMidas = false;
+
+        });
+
+        if(!isMidas){
+            thread.start();
+        }
+
+
+
+
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, PrePostProcessor.mInputWidth, PrePostProcessor.mInputHeight, true);
 
         final Tensor inputTensor = TensorImageUtils.bitmapToFloat32Tensor(resizedBitmap, PrePostProcessor.NO_MEAN_RGB, PrePostProcessor.NO_STD_RGB);

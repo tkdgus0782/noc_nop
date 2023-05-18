@@ -207,7 +207,6 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
             if (mModule == null) {
                 mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(),
                         modelName));//모델 불러오기
-                myMidas = new MiDASModel(this);
             }
         } catch (IOException e) {
             Log.e("Object Detection", "Error reading assets", e);
@@ -230,6 +229,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
         Bitmap finalBitmap = bitmap;
         Thread thread = new Thread(() -> {
+            myMidas = new MiDASModel(this);
             isMidas = true;
             Bitmap depthBitmap = getDepthImage(finalBitmap, t1);
             temp = depthBitmap;
@@ -241,9 +241,6 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         if(!isMidas){
             thread.start();
         }
-
-
-
 
         Bitmap resizedBitmap = Bitmap.createScaledBitmap(bitmap, PrePostProcessor.mInputWidth, PrePostProcessor.mInputHeight, true);
 

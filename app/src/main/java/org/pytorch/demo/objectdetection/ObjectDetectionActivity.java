@@ -15,6 +15,7 @@ import android.view.TextureView;
 import android.view.ViewStub;
 
 import android.os.Vibrator;
+import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.WorkerThread;
@@ -103,6 +104,8 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         int count = 0;
         int detected[] = new int[PrePostProcessor.nClass];
 
+        StringBuilder resultBuilder = new StringBuilder();
+
         for(int i=0;i<results.size();i++){
             Result tmp = results.get(i);
             int idx = tmp.classIndex;
@@ -150,12 +153,22 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                     }
                     detected[idx]++;
                     count++;
+
+                    resultBuilder.append("Class: ").append(PrePostProcessor.mClasses[idx]).append(", ");
+                    resultBuilder.append("tX1: ").append(tX1).append(", ");
+                    resultBuilder.append("tX2: ").append(tX2).append(", ");
+                    resultBuilder.append("tY1: ").append(tY1).append(", ");
+                    resultBuilder.append("tY2: ").append(tY2).append(", ");
+                    resultBuilder.append("\n");
                 }
                 else{
                     Log.i("threshold:", "no\n");
                 }
             }
         }
+
+        TextView resultTextView = findViewById(R.id.resultTextView);
+        resultTextView.setText(resultBuilder.toString());
 
         //tts
         if(!this.TTS){//아직 tts로 알려준지 얼마 안됐음.

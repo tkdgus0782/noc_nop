@@ -15,17 +15,15 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.PorterDuff;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
+import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.ImageView;
 import android.widget.ProgressBar;
-import android.widget.Switch;
 
 import org.pytorch.IValue;
 import org.pytorch.LiteModuleLoader;
@@ -43,8 +41,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements Runnable {//c언어 main이라 생각하면 됩니다ㅏ
-
+public class SelectDetect extends AppCompatActivity implements Runnable {//c언어 main이라 생각하면 됩니다ㅏ
     private String modelName = "yolov5s.torchscript";
     private String metaName = "classes.txt";
 
@@ -82,8 +79,6 @@ public class MainActivity extends AppCompatActivity implements Runnable {//c언�
         }
     }
 
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {//객체 생성
         super.onCreate(savedInstanceState);
@@ -98,62 +93,97 @@ public class MainActivity extends AppCompatActivity implements Runnable {//c언�
 
         //권한 관련
 
-        setContentView(R.layout.activity_main);//
-
-
-        final Button buttonLive = findViewById(R.id.liveButton);//라이브 버튼. 아마 이것도 없애지 않을까. 그냥 없애고 기본으로 이모드가 설정되게 하려나
-        buttonLive.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                final Intent intent = new Intent(MainActivity.this, ObjectDetectionActivity.class);
-                startActivity(intent);
-            }
-        });
-        final Button selectPage = findViewById(R.id.selectButton);
-        final Button setPage = findViewById(R.id.setButton);
-        final Button depthPage = findViewById(R.id.depthButton);
-
-        selectPage.setOnClickListener(new View.OnClickListener() {
-            public void onClick(View v) {
-                final Intent intent = new Intent(MainActivity.this, SelectDetect.class);
-                startActivity(intent);
-            }
-        });
-
-
-
-        final Switch colorChange = findViewById(R.id.colorChange);
-        colorChange.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                int thumbColor;
-                int trackColor;
-
-                if (isChecked) {
-                    thumbColor = getResources().getColor(R.color.White);
-                    trackColor = getResources().getColor(R.color.Gray);
-                    depthPage.setVisibility(View.INVISIBLE);
-                    selectPage.setVisibility(View.INVISIBLE);
-                    setPage.setVisibility(View.INVISIBLE);
-                    buttonLive.setVisibility(View.INVISIBLE);
-
-                } else {
-                    thumbColor = getResources().getColor(R.color.Dark);
-                    trackColor = getResources().getColor(R.color.Gray);
-                    depthPage.setVisibility(View.VISIBLE);
-                    selectPage.setVisibility(View.VISIBLE);
-                    setPage.setVisibility(View.VISIBLE);
-                    buttonLive.setVisibility(View.VISIBLE);
-                }
-
-                colorChange.getThumbDrawable().setColorFilter(thumbColor, PorterDuff.Mode.MULTIPLY);
-                colorChange.getTrackDrawable().setColorFilter(trackColor, PorterDuff.Mode.MULTIPLY);
-            }
-        });
-
-
+        setContentView(R.layout.activity_select);//
 
         try {
-            mModule = LiteModuleLoader.load(MainActivity.assetFilePath(getApplicationContext(), modelName));//
+            mBitmap = BitmapFactory.decodeStream(getAssets().open(mTestImages[mImageIndex]));
+        } catch (IOException e) {
+            Log.e("Object Detection", "Error reading assets", e);
+            finish();
+        }//테스트이미지를 읽어서 비트맵으로 변환
+
+        mImageView = findViewById(R.id.imageView);//테스트 이미지 뷰
+        mImageView.setImageBitmap(mBitmap);
+        mResultView = findViewById(R.id.resultView);//테스트 이미지에 박스 라벨링한 결과 뷰
+        mResultView.setVisibility(View.INVISIBLE);
+
+        final Button buttonTest = findViewById(R.id.testButton);//테스트이미지 123 옮기는 버튼인데, 나중에는 아마 삭제 하지 않으띾
+        buttonTest.setText(("Test Image 1/3"));
+        buttonTest.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mResultView.setVisibility(View.INVISIBLE);
+                mImageIndex = (mImageIndex + 1) % mTestImages.length;
+                buttonTest.setText(String.format("Text Image %d/%d", mImageIndex + 1, mTestImages.length));
+
+                try {
+                    mBitmap = BitmapFactory.decodeStream(getAssets().open(mTestImages[mImageIndex]));
+                    mImageView.setImageBitmap(mBitmap);
+                } catch (IOException e) {
+                    Log.e("Object Detection", "Error reading assets", e);
+                    finish();
+                }
+            }
+        });
+
+
+        final Button buttonSelect = findViewById(R.id.selectButton);//이미지 셀렉트하는 버튼인데 이것도 아마 삭제하지 않을까. live만 남길듯
+        buttonSelect.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mResultView.setVisibility(View.INVISIBLE);
+
+                final CharSequence[] options = { "Choose from Photos", "Take Picture", "Cancel" };
+                AlertDialog.Builder builder = new AlertDialog.Builder(SelectDetect.this);
+                builder.setTitle("New Test Image");
+
+                builder.setItems(options, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int item) {
+                        if (options[item].equals("Take Picture")) {
+                            Intent takePicture = new Intent(android.provider.MediaStore.ACTION_IMAGE_CAPTURE);
+                            startActivityForResult(takePicture, 0);
+                        }
+                        else if (options[item].equals("Choose from Photos")) {
+                            Intent pickPhoto = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.INTERNAL_CONTENT_URI);
+                            startActivityForResult(pickPhoto , 1);
+                        }
+                        else if (options[item].equals("Cancel")) {
+                            dialog.dismiss();
+                        }
+                    }
+                });
+                builder.show();
+            }
+        });
+
+
+        mButtonDetect = findViewById(R.id.detectButton);
+        mProgressBar = (ProgressBar) findViewById(R.id.progressBar);//프로세싱 중일대 뜨는 로딩 바
+
+        mButtonDetect.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                mButtonDetect.setEnabled(false);
+                mProgressBar.setVisibility(ProgressBar.VISIBLE);
+                mButtonDetect.setText(getString(R.string.run_model));
+
+                mImgScaleX = (float)mBitmap.getWidth() / PrePostProcessor.mInputWidth;
+                mImgScaleY = (float)mBitmap.getHeight() / PrePostProcessor.mInputHeight;
+
+                mIvScaleX = (mBitmap.getWidth() > mBitmap.getHeight() ? (float)mImageView.getWidth() / mBitmap.getWidth() : (float)mImageView.getHeight() / mBitmap.getHeight());
+                mIvScaleY  = (mBitmap.getHeight() > mBitmap.getWidth() ? (float)mImageView.getHeight() / mBitmap.getHeight() : (float)mImageView.getWidth() / mBitmap.getWidth());
+
+                mStartX = (mImageView.getWidth() - mIvScaleX * mBitmap.getWidth())/2;
+                mStartY = (mImageView.getHeight() -  mIvScaleY * mBitmap.getHeight())/2;
+
+                //이미지 비율을 맞추기 위해서 몇배로 조정해야하는지부
+
+                //Fork생각하심 됩니다.
+                Thread thread = new Thread(SelectDetect.this);
+                thread.start();
+            }
+        });
+
+        try {
+            mModule = LiteModuleLoader.load(SelectDetect.assetFilePath(getApplicationContext(), modelName));//
             BufferedReader br = new BufferedReader(new InputStreamReader(getAssets().open(metaName)));
             //에셋 파일에 추가한 모델 + 모델에 학습된 클래스명들을 순서대로 \n으로 구분해서 같이 투입. 내부적으론 숫자로 관리하니까 무조건 txt도 넣어줘야함
             String line;

@@ -110,7 +110,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {//cì–¸ì
         });
         final Button selectPage = findViewById(R.id.selectButton);
         final Button setPage = findViewById(R.id.setButton);
-        final Button depthPage = findViewById(R.id.depthButton);
+        final Button hidePage = findViewById(R.id.hideButton);
 
         selectPage.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
@@ -119,36 +119,36 @@ public class MainActivity extends AppCompatActivity implements Runnable {//cì–¸ì
             }
         });
 
-
-
-        final Switch colorChange = findViewById(R.id.colorChange);
-        colorChange.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                int thumbColor;
-                int trackColor;
-
-                if (isChecked) {
-                    thumbColor = getResources().getColor(R.color.White);
-                    trackColor = getResources().getColor(R.color.Gray);
-                    depthPage.setVisibility(View.INVISIBLE);
-                    selectPage.setVisibility(View.INVISIBLE);
-                    setPage.setVisibility(View.INVISIBLE);
-                    buttonLive.setVisibility(View.INVISIBLE);
-
-                } else {
-                    thumbColor = getResources().getColor(R.color.Dark);
-                    trackColor = getResources().getColor(R.color.Gray);
-                    depthPage.setVisibility(View.VISIBLE);
-                    selectPage.setVisibility(View.VISIBLE);
-                    setPage.setVisibility(View.VISIBLE);
-                    buttonLive.setVisibility(View.VISIBLE);
-                }
-
-                colorChange.getThumbDrawable().setColorFilter(thumbColor, PorterDuff.Mode.MULTIPLY);
-                colorChange.getTrackDrawable().setColorFilter(trackColor, PorterDuff.Mode.MULTIPLY);
+        setPage.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                final Intent intent = new Intent(MainActivity.this, SettingActivity.class);
+                startActivity(intent);
             }
         });
+
+        hidePage.setOnClickListener(new View.OnClickListener() {
+            boolean isVisible = true;
+            @Override
+            public void onClick(View v) {
+                if (isVisible) {
+                    hidePage.setAlpha(0.0f);
+                    selectPage.setAlpha(0.0f);
+                    setPage.setAlpha(0.0f);
+                    buttonLive.setAlpha(0.0f);
+                    isVisible = false;
+                } else {
+                    hidePage.setAlpha(1.0f);
+                    selectPage.setAlpha(1.0f);
+                    setPage.setAlpha(1.0f);
+                    buttonLive.setAlpha(1.0f);
+                    isVisible = true;
+                }
+            }
+        });
+
+
+
+
 
 
 

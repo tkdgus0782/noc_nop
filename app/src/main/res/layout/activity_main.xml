@@ -16,10 +16,11 @@
         android:text="start"
         android:textAllCaps="false"
         android:textSize="30sp"
-        app:layout_constraintBottom_toTopOf="@+id/depthButton"
+        app:layout_constraintBottom_toTopOf="@+id/hideButton"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/setButton"
         app:layout_constraintTop_toTopOf="parent"
+        android:alpha = "1.0"
         tools:visibility="invisible" />
 
     <Button
@@ -27,7 +28,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#FFFFFF"
-        android:paddingBottom="60dp"
         android:text="setting"
         android:textAllCaps="false"
         android:textSize="30sp"
@@ -35,20 +35,22 @@
         app:layout_constraintLeft_toRightOf="@+id/liveButton"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        android:alpha = "1.0"
         tools:visibility="invisible" />
 
     <Button
-        android:id="@+id/depthButton"
+        android:id="@+id/hideButton"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:background="#FFFFFF"
-        android:text="new"
+        android:text="hide"
         android:textAllCaps="false"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toLeftOf="@+id/selectButton"
         app:layout_constraintTop_toBottomOf="@id/liveButton"
+        android:alpha = "1.0"
         tools:visibility="invisible" />
 
     <Button
@@ -60,19 +62,11 @@
         android:textAllCaps="false"
         android:textSize="30sp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintLeft_toRightOf="@id/depthButton"
+        app:layout_constraintLeft_toRightOf="@id/hideButton"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@id/setButton"
+        android:alpha = "1.0"
         tools:visibility="invisible" />
 
-    <Switch
-        android:id="@+id/colorChange"
-        android:layout_width="120dp"
-        android:layout_height="60dp"
-
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-
-        />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

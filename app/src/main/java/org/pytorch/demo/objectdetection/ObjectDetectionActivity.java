@@ -99,8 +99,8 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                                ArrayList<Result> results,
                                int[] classes, float threshold){
         Vibrator vibrator = (Vibrator)getSystemService(VIBRATOR_SERVICE);
-        float tX1 = rX/3;   float tY1 = rY/3;
-        float tX2 = rX*2/3; float tY2 = rY*2/3;
+        float tX1 = rX/3;   float tY1 = 0;
+        float tX2 = rX*2/3; float tY2 = rY;
         int count = 0;
         int detected[] = new int[PrePostProcessor.nClass];
 
@@ -146,7 +146,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                 float ratio = (overlap)/(target2) > (overlap)/(target1) ? (overlap)/(target2) : (overlap)/(target1);
                 //Log.i("threshold:",overlap + " " + target1 + " " + target2 + " " +  ratio);
                 //Log.i("threshold:",rX + " " + rY + " " + box.right + " " +  box.left + " " + box.top + " " + box.bottom + " " + overlap);
-                if(ratio >= threshold){
+                if(ratio >= threshold && target2 >= rX*rY/9.0){
                     //Log.i("threshold:","yes\n");
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         vibrator.vibrate(VibrationEffect.createOneShot(10,100));
@@ -292,7 +292,7 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
 
         detectInBox((float)mResultView.getWidth(),(float)mResultView.getHeight(),
                 results,
-                null, 0.5f);
+                null, 0.3f);
 
 
         Log.i( "in ObjectDetection", "ObjectDetection inference speed: " + (System.currentTimeMillis() - t1));

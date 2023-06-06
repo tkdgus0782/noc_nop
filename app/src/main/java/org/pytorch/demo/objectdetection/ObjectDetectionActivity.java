@@ -154,12 +154,30 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                     detected[idx]++;
                     count++;
 
-                    resultBuilder.append("Class: ").append(PrePostProcessor.mClasses[idx]).append(", ");
+                    double danger = Math.random();
+                    String temp = PrePostProcessor.mClasses[idx];
+                    if(temp.equals("person")){
+                        danger = danger * 0.4 + 0.2;
+                    }
+                    else if(temp.equals("car")){
+                        danger = danger * 0.6 + 0.2;
+                    }
+                    else{
+                        danger = danger * 0.3 + 0.1;
+                    }
+
+                    resultBuilder.append("Class ").append(PrePostProcessor.mClasses[idx]);
+
+                    resultBuilder.append(" is dangerous in ").append(danger);
+
+                    /*
                     resultBuilder.append("tX1: ").append(tX1).append(", ");
                     resultBuilder.append("tX2: ").append(tX2).append(", ");
                     resultBuilder.append("tY1: ").append(tY1).append(", ");
                     resultBuilder.append("tY2: ").append(tY2).append(", ");
+                    */
                     resultBuilder.append("\n");
+
                 }
                 else{
                     Log.i("threshold:", "no\n");
@@ -239,8 +257,8 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
         Matrix matrix = new Matrix();
         matrix.postRotate(90.0f);
         bitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
-
-        Bitmap finalBitmap = bitmap;
+        matrix.postRotate(-90.0f);
+        Bitmap finalBitmap = Bitmap.createBitmap(bitmap, 0, 0, bitmap.getWidth(), bitmap.getHeight(), matrix, true);
         Thread thread = new Thread(() -> {
             myMidas = new MiDASModel(this);
             isMidas = true;

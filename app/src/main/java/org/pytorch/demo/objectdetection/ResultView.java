@@ -53,13 +53,16 @@ public class ResultView extends View {//결과 출력 관련
         mPaintRectangle.setColor(Color.RED);
         mPaintRectangle.setStyle(Paint.Style.STROKE);
 
+
         if(temp != null){
-            canvas.drawBitmap(temp,null,new RectF(0,0,cw,ch),null);
+            //canvas.drawBitmap(temp,null,new RectF(0,0,cw,ch),null);
         }
 
-        canvas.drawRect(new RectF(cw/3,ch/3,2*cw/3,2*ch/3), mPaintRectangle);
+        //canvas.drawRect(new RectF(cw/3,ch/3,2*cw/3,2*ch/3), mPaintRectangle);
 
-        if (mResults == null) return;
+        if (mResults == null)
+            return;
+
 
         for (Result result : mResults) {
             mPaintRectangle.setColor(Color.YELLOW);//박스 색 조정

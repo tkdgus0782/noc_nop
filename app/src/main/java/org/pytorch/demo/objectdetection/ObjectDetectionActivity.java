@@ -236,7 +236,13 @@ public class ObjectDetectionActivity extends AbstractCameraXActivity<ObjectDetec
                     temp += detected[i] +PrePostProcessor.mClasses[i] +",";
                 }
             }
-            voice.setSpeechRate((float)6); // 음성 속도 지정
+            if(MainActivity.tts2==false) {
+                voice.setSpeechRate((float) 6); // 음성 속도 지정
+            }
+            else if(MainActivity.tts2 == true)
+            {
+                voice.setSpeechRate((float) 12);
+            }
             temp += "가 영역내에서 감지되었습니다.";
             Log.i("",temp);
             text = temp;

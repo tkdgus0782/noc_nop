@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements Runnable {//cì–¸ì
     static public boolean hidemode = false;
     static public boolean vib = true;
     static public boolean showlog = true;
+    static public boolean showdepth = true;
+    static public boolean tts2 = false;
 
 
     protected class backgroundThread extends Thread{
@@ -119,7 +121,7 @@ public class MainActivity extends AppCompatActivity implements Runnable {//cì–¸ì
 
         selectPage.setOnClickListener(new View.OnClickListener() {
             public void onClick(View v) {
-                final Intent intent = new Intent(MainActivity.this, SelectDetect.class);
+                final Intent intent = new Intent(MainActivity.this, ManualActivity.class);
                 startActivity(intent);
             }
         });

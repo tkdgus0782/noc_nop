@@ -55,7 +55,9 @@ public class ResultView extends View {//결과 출력 관련
 
 
         if(temp != null){
-            //canvas.drawBitmap(temp,null,new RectF(0,0,cw,ch),null);
+            if(MainActivity.showdepth) {
+                canvas.drawBitmap(temp, null, new RectF(0, 0, cw, ch), null);
+            }
         }
 
         canvas.drawRect(new RectF(cw/3,0,2*cw/3,ch), mPaintRectangle);

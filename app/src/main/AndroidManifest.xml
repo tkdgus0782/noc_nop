@@ -20,8 +20,8 @@
             android:name=".MainActivity"
             android:configChanges="orientation"
             android:exported="true"
-            android:showOnLockScreen="true"
-            android:screenOrientation="sensorPortrait">
+            android:screenOrientation="sensorPortrait"
+            android:showOnLockScreen="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -32,23 +32,23 @@
             android:name=".SelectDetect"
             android:configChanges="orientation"
             android:exported="true"
-            android:screenOrientation="portrait"
             android:launchMode="singleInstance"
-
-        />
-
+            android:screenOrientation="portrait" />
         <activity
             android:name=".ObjectDetectionActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
             android:launchMode="singleInstance"
-            />
+            android:screenOrientation="portrait" />
         <activity
             android:name=".SettingActivity"
             android:configChanges="orientation"
-            android:screenOrientation="portrait"
             android:launchMode="singleInstance"
-            />
+            android:screenOrientation="portrait" />
+        <activity
+            android:name=".ManualActivity"
+            android:configChanges="orientation"
+            android:launchMode="singleInstance"
+            android:screenOrientation="portrait" />
     </application>
 
 </manifest>
